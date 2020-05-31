@@ -62,9 +62,14 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    httpService.fetchWeatherForecast(2052).then((value) => setState(() {
-          weatherForecast = value;
-        }));
+    _getInitialWeatherForecast();
+  }
+
+  void _getInitialWeatherForecast() async {
+    weatherForecast = await httpService.fetchWeatherForecast(2052);
+    setState(() {
+      weatherForecast;
+    });
   }
 
   void _incrementCounter() async {
