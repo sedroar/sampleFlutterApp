@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sampleflutterapp/httpService.dart' as httpService;
+import 'package:sampleflutterapp/weatherForecast.dart';
 
 void main() {
   runApp(MyApp());
@@ -34,6 +36,9 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
+  // WeatherForecast weatherForecast =
+  Future<WeatherForecast> futureWeatherForecast;
+
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
@@ -51,15 +56,28 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  WeatherForecast weatherForecast;
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    httpService.fetchWeatherForecast(2052).then((value) => setState(() {
+          weatherForecast = value;
+        }));
+  }
+
+  void _incrementCounter() async {
+    _counter++;
+    weatherForecast = await httpService.fetchWeatherForecast(_counter);
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
+      _counter;
+      weatherForecast;
     });
   }
 
@@ -71,6 +89,14 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
+    String weatherDate = '';
+    String weatherForecastString = '';
+    if (weatherForecast != null) {
+      weatherDate = 'Weather on date ' + weatherForecast.fecha;
+      weatherForecastString = 'Será ' + weatherForecast.clima;
+    }
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -108,37 +134,43 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontSize: 36.0,
               ),
             ),
+            Text(
+                weatherDate
+            ),
+            Text(
+                weatherForecastString
+            ),
           ],
         ),
       ),
       floatingActionButton: RawMaterialButton(
-        fillColor: Colors.blue,
-        splashColor: Colors.cyanAccent,
-        elevation: 10.0,
-        onPressed: _incrementCounter,
-        shape: const StadiumBorder(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 8.0,
-            horizontal: 20.0
-          ),
-          child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: const <Widget>[
-            const Icon(
-                Icons.keyboard_arrow_up,
-                color: Colors.white
-            ),
-            const SizedBox(width: 8),
-            const Text(
-                "Increment",
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold
+          fillColor: Colors.blue,
+          splashColor: Colors.cyanAccent,
+          elevation: 10.0,
+          onPressed: _incrementCounter,
+          shape: const StadiumBorder(),
+          child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 20.0
               ),
-            )
-          ],
-        ))
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const <Widget>[
+                  const Icon(
+                      Icons.keyboard_arrow_up,
+                      color: Colors.white
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    "Increment",
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold
+                    ),
+                  )
+                ],
+              ))
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
